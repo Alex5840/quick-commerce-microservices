@@ -1,0 +1,43 @@
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+
+class AuthService {
+  static const baseUrl = "http://localhost:8001";
+
+  static Future<bool> login(String email, String password) async {
+    final response = await http.post(
+      Uri.parse("$baseUrl/login"),
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode({
+        "email": email,
+        "password": password,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  static Future<bool> register(
+      String name, String email, String password) async {
+    final response = await http.post(
+      Uri.parse("$baseUrl/register"),
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode({
+        "name": name,
+        "email": email,
+        "password": password,
+      }),
+    );
+
+    if (response.statusCode == 201 ||
+        response.statusCode == 200) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+}
