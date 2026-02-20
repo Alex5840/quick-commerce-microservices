@@ -1,3 +1,6 @@
+import org.gradle.api.tasks.Delete
+import java.io.File
+
 allprojects {
     repositories {
         google()
@@ -5,20 +8,18 @@ allprojects {
     }
 }
 
-val newBuildDir: Directory =
-    rootProject.layout.buildDirectory
-        .dir("../../build")
-        .get()
-rootProject.layout.buildDirectory.value(newBuildDir)
+// Place the Gradle build outputs outside the Android project folders so CI/tools
+// can access a single top-level `build/` directory.
+val newRootBuildDir: File = rootProject.projectDir.resolve("../../build")
+rootProject.buildDir = newRootBuildDir
 
 subprojects {
-    val newSubprojectBuildDir: Directory = newBuildDir.dir(project.name)
-    project.layout.buildDirectory.value(newSubprojectBuildDir)
+    project.buildDir = File(newRootBuildDir, project.name)
 }
 subprojects {
     project.evaluationDependsOn(":app")
 }
 
 tasks.register<Delete>("clean") {
-    delete(rootProject.layout.buildDirectory)
+    delete(rootProject.buildDir)
 }
